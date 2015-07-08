@@ -2,7 +2,7 @@
 <div id="select"></div>
 
 <div id="sidebar">
-<form name="scanning" action="index.php" onsubmit="return pre_scan(this,ias);" method="POST">
+<form name="scanning" action="index.php" onsubmit="return pre_scan(this);" method="POST">
 
 <div class="side_box">
 <h2>Scanners</h2>
@@ -65,6 +65,18 @@ echo file_exists("config/paper.json")?file_get_contents("config/paper.json"):'{"
 </div>
 <div class="control">
 <div class="ie_276228"><select name="mode" class="title"></select></div>
+</div>
+
+<div<?php echo $ShowRawFormat?'':' style="display:none;"';?>>
+<div class="label">
+<span class="tool">RAW Format<span class="tip">The format the scanner's scan is saved (pre-processing)</span></span>:
+</div>
+<div class="control">
+<select name="raw">
+<option value="pnm">pnm - Portable Any Map</option>
+<option value="tiff"<?php echo $RawScanFormat==1?' selected="selected"':'';?>>tiff - Tagged Image File Format</option>
+</select>
+</div>
 </div>
 
 <div id="duplex">
@@ -162,7 +174,7 @@ Scan Image
 <h2>Settings</h2>
 <p>
 <input name="set_save" type="text" size="11" onkeypress="if(event.which==13||event.keyCode==13){document.scanning.saveas.click();return false;}"/>
-<input onclick="if(document.scanning.set_save.value==''){return false;}else{document.scanning.removeAttribute('onsubmit');}" type="submit" name="saveas" value="Save"/>
+<input onclick="if(document.scanning.set_save.value==''){return false;}" type="submit" name="saveas" value="Save"/>
 <input type="button" value="Set Default" onclick="setDefault(document.scanning)"/>
 </p>
 <p class="center">
@@ -177,10 +189,11 @@ Scan Image
 		echo '<a href="javascript:void(0);" onclick="config({';
 		$str='';
 		foreach($opt as $key => $val){
-			$str.="'$key':".(is_numeric($val)?$val:"'$val'").",";
+			$key=html(js($key));
+			$str.="'$key':".(is_numeric($val)?$val:"'".html(js($val))."'").",";
 		}
-		echo substr($str,0,-1);
-		echo '});">'.$id.'</a>';
+		echo "$str'set_save':this[TC]});".
+			'">'.html($id).'</a>';
 		$i++;
 		if($i<$max)
 			echo " | ";
